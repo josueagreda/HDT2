@@ -18,13 +18,15 @@
 # Ambas funciones deben redondear a 2 decimales con round().
 
 def precio_con_descuento(precio_base, porcentaje):
-    # TODO
-    pass
+    descuento = precio_base * (porcentaje / 100)
+    precio_final = precio_base - descuento
+    return round(precio_final, 2)
 
 
 def precio_con_iva(precio, iva):
-    # TODO
-    pass
+    monto_iva = precio * (iva / 100)
+    total = precio + monto_iva
+    return round(total, 2)
 
 
 # --- Pruebas (NO modificar) ---
@@ -61,18 +63,31 @@ print(f"Q200 + 12% IVA = Q{precio_con_iva(200.0, 12)}")
 # DEBE usar las dos funciones anteriores internamente.
 
 def clasificar_duracion(minutos):
-    # TODO
-    pass
+    if minutos < 90:
+        return "corta"
+    if minutos <= 150:
+        return "estándar"
+    return "larga"
 
 
 def clasificar_rating(rating):
-    # TODO
-    pass
+    if rating < 4.0:
+        return "mala"
+    if rating <= 6.9:
+        return "regular"
+    if rating <= 8.4:
+        return "buena"
+    return "excelente"
 
 
 def es_recomendada(duracion, rating):
     # TODO: Usa clasificar_duracion y clasificar_rating
-    pass
+    categoria_duracion = clasificar_duracion(duracion)
+    categoria_rating = clasificar_rating(rating)
+
+    rating_valido = categoria_rating == "buena" or categoria_rating == "excelente"
+    duracion_valida = categoria_duracion == "corta" or categoria_duracion == "estándar"
+    return rating_valido and duracion_valida
 
 
 # --- Pruebas (NO modificar) ---
@@ -116,7 +131,35 @@ for titulo, dur, rat in peliculas:
 
 def analizar_ventas(ventas):
     # TODO: SIN sum(), max(), min(), len()
-    pass
+    total = 0
+    conteo = 0
+    mejor_dia = -1
+    peor_dia = -1
+    mayor_venta = 0
+    menor_venta = 0
+
+    for indice, venta in enumerate(ventas):
+        total += venta
+        conteo += 1
+
+        if indice == 0:
+            mayor_venta = venta
+            menor_venta = venta
+            mejor_dia = indice
+            peor_dia = indice
+        else:
+            if venta > mayor_venta:
+                mayor_venta = venta
+                mejor_dia = indice
+            if venta < menor_venta:
+                menor_venta = venta
+                peor_dia = indice
+
+    if conteo == 0:
+        return (0, 0.0, -1, -1)
+
+    promedio = round(total / conteo, 2)
+    return (total, promedio, mejor_dia, peor_dia)
 
 
 # --- Pruebas (NO modificar) ---
@@ -162,18 +205,33 @@ print(f"Peor día: {dias[peor]} ({semana_imax[peor]} entradas)")
 # El nombre debe ocupar 14 caracteres alineado a la izquierda.
 
 def formato_moneda(cantidad):
-    # TODO
-    pass
+    return f"Q{cantidad:,.2f}"
 
 
 def barra_visual(valor, maximo, ancho=20):
-    # TODO
-    pass
+    if maximo <= 0:
+        proporcion = 0
+    else:
+        proporcion = valor / maximo
+
+    if proporcion < 0:
+        proporcion = 0
+    if proporcion > 1:
+        proporcion = 1
+
+    llenos = int((proporcion * ancho) + 0.5)
+    vacios = ancho - llenos
+    porcentaje = round(proporcion * 100)
+    barra = "█" * llenos + "░" * vacios
+    return f"{barra} {porcentaje}%"
 
 
 def linea_reporte(nombre, valor, maximo, ancho=20):
     # TODO: Usa formato_moneda y barra_visual
-    pass
+    nombre_fmt = f"{nombre:<14}"
+    valor_fmt = f"{formato_moneda(valor):<10}"
+    barra = barra_visual(valor, maximo, ancho)
+    return f"{nombre_fmt} | {valor_fmt} | {barra}"
 
 
 # --- Pruebas (NO modificar) ---

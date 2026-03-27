@@ -67,11 +67,165 @@ peliculas = [
 
 # --- Tu código aquí ---
 
-# TODO: Implementa las 6 funciones descritas arriba
+def contar_elementos(lista):
+    conteo = 0
+    for _ in lista:
+        conteo += 1
+    return conteo
 
 
-# TODO: Llamada a la función principal (descomentar cuando esté listo)
-# sistema_taquilla(peliculas)
+def total_gastado_compras(compras):
+    total = 0
+    for compra in compras:
+        total += compra[3]
+    return round(total, 2)
+
+
+def leer_entero(mensaje):
+    try:
+        return int(input(mensaje))
+    except EOFError:
+        raise
+    except ValueError:
+        return None
+
+
+def mostrar_menu():
+    print("=" * 40)
+    print("       CINEDATA GT 2026")
+    print("=" * 40)
+    print("1. Ver cartelera")
+    print("2. Comprar entrada")
+    print("3. Ver mis compras")
+    print("4. Estadísticas")
+    print("5. Salir")
+    try:
+        return input("Elige una opción: ")
+    except EOFError:
+        return "5"
+
+
+def mostrar_cartelera(peliculas):
+    print("=== CARTELERA ===")
+    for numero, pelicula in enumerate(peliculas, start=1):
+        titulo, genero, rating, precio = pelicula
+        print(f"[{numero}] {titulo} ({genero}) — ★ {rating} — Q{precio:.2f}")
+
+
+def comprar_entrada(peliculas, compras):
+    print("=== COMPRAR ENTRADA ===")
+    total_peliculas = contar_elementos(peliculas)
+
+    numero = None
+    while numero is None or numero < 1 or numero > total_peliculas:
+        try:
+            numero = leer_entero(f"Elige película (1-{total_peliculas}): ")
+        except EOFError:
+            print("Compra cancelada.")
+            return
+        if numero is None or numero < 1 or numero > total_peliculas:
+            print("Selección inválida. Intenta de nuevo.")
+
+    cantidad = None
+    while cantidad is None or cantidad <= 0:
+        try:
+            cantidad = leer_entero("Cantidad de entradas: ")
+        except EOFError:
+            print("Compra cancelada.")
+            return
+        if cantidad is None or cantidad <= 0:
+            print("Cantidad inválida. Intenta de nuevo.")
+
+    titulo, genero, rating, precio_unitario = peliculas[numero - 1]
+    subtotal = precio_unitario * cantidad
+    descuento = 0
+
+    if cantidad > 4:
+        descuento = subtotal * 0.10
+        print("Descuento 10% por volumen (>4 entradas)")
+
+    total = subtotal - descuento
+    compras.append([titulo, cantidad, precio_unitario, round(total, 2)])
+
+    if descuento > 0:
+        print(
+            f"✓ Compra: {cantidad}x {titulo} — Q{precio_unitario:.2f} c/u — "
+            f"Desc: Q{descuento:.2f} — Total: Q{total:.2f}"
+        )
+    else:
+        print(f"✓ Compra: {cantidad}x {titulo} — Q{precio_unitario:.2f} c/u — Total: Q{total:.2f}")
+
+
+def mostrar_compras(compras):
+    print("=== MIS COMPRAS ===")
+    if contar_elementos(compras) == 0:
+        print("No hay compras registradas.")
+        return
+
+    total = 0
+    for numero, compra in enumerate(compras, start=1):
+        titulo, cantidad, precio_unitario, monto_total = compra
+        total += monto_total
+        print(f"#{numero} {titulo:<28} | {cantidad} entradas | Q{monto_total:.2f}")
+
+    print("---")
+    print(f"TOTAL: Q{total:.2f}")
+
+
+def resumen_estadisticas(compras):
+    print("=== ESTADÍSTICAS ===")
+    if contar_elementos(compras) == 0:
+        print("No hay datos para mostrar.")
+        return
+
+    total_gastado = 0
+    total_entradas = 0
+    conteo_compras = 0
+    compra_mas_cara_titulo = ""
+    compra_mas_cara_total = 0
+
+    for compra in compras:
+        titulo, cantidad, precio_unitario, monto_total = compra
+        total_gastado += monto_total
+        total_entradas += cantidad
+        conteo_compras += 1
+
+        if conteo_compras == 1 or monto_total > compra_mas_cara_total:
+            compra_mas_cara_titulo = titulo
+            compra_mas_cara_total = monto_total
+
+    promedio = total_gastado / conteo_compras
+
+    print(f"Total gastado       : Q{total_gastado:.2f}")
+    print(f"Total entradas      : {total_entradas}")
+    print(f"Compra más cara     : {compra_mas_cara_titulo} (Q{compra_mas_cara_total:.2f})")
+    print(f"Promedio por compra : Q{promedio:.2f}")
+
+
+def sistema_taquilla(peliculas):
+    compras = []
+
+    while True:
+        opcion = mostrar_menu()
+
+        if opcion == "1":
+            mostrar_cartelera(peliculas)
+        elif opcion == "2":
+            comprar_entrada(peliculas, compras)
+        elif opcion == "3":
+            mostrar_compras(compras)
+        elif opcion == "4":
+            resumen_estadisticas(compras)
+        elif opcion == "5":
+            total = total_gastado_compras(compras)
+            print(f"¡Gracias por visitar CineData GT! Total gastado: Q{total:.2f}")
+            break
+        else:
+            print("Opción no válida. Intenta de nuevo.")
+
+
+# Llamada a la función principal
+sistema_taquilla(peliculas)
 
 
 # === Ejemplo de interacción esperada ===

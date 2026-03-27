@@ -26,8 +26,21 @@
 # Todos los valores redondeados a 2 decimales.
 
 def calcular_ingreso(precio_base, vendidas, descuento=0.0, iva=12.0, propina_pct=0.0):
-    # TODO
-    pass
+    ingreso_bruto = precio_base * vendidas
+    monto_descuento = ingreso_bruto * (descuento / 100)
+    subtotal = ingreso_bruto - monto_descuento
+    monto_iva = subtotal * (iva / 100)
+    monto_propina = subtotal * (propina_pct / 100)
+    total = subtotal + monto_iva + monto_propina
+
+    return (
+        round(ingreso_bruto, 2),
+        round(monto_descuento, 2),
+        round(subtotal, 2),
+        round(monto_iva, 2),
+        round(monto_propina, 2),
+        round(total, 2),
+    )
 
 
 # --- Pruebas (NO modificar) ---
@@ -72,8 +85,11 @@ print(f"Caso 3 — Bruto: Q{r3[0]} | Desc: Q{r3[1]} | Sub: Q{r3[2]} | IVA: Q{r3[
 #          → "CD26-VIP-CM0047"
 
 def generar_credencial(nombre_completo, zona="general", numero=1, prefijo="CD26"):
-    # TODO
-    pass
+    partes = nombre_completo.split()
+    iniciales = (partes[0][0] + partes[-1][0]).upper()
+    zona3 = zona[:3].upper()
+    correlativo = str(numero).zfill(4)
+    return f"{prefijo}-{zona3}-{iniciales}{correlativo}"
 
 
 # --- Pruebas (NO modificar) ---
@@ -114,7 +130,39 @@ print(generar_credencial("María Luisa Fernández Torres", zona="imax", numero=8
 def construir_reporte(titulo, datos, moneda="Q", mostrar_promedio=True,
                       mostrar_ranking=False, ancho_nombre=20):
     # TODO: SIN sum() ni len()
-    pass
+    lineas = []
+    encabezado = f" {titulo} "
+    ancho_titulo = 31
+    total_pad = ancho_titulo - len(encabezado)
+    if total_pad < 0:
+        total_pad = 0
+    if total_pad == 0:
+        pad_izq = 0
+    else:
+        pad_izq = (total_pad - 1) // 2
+    pad_der = total_pad - pad_izq
+    lineas.append("=" * pad_izq + encabezado + "=" * pad_der)
+
+    total = 0
+    conteo = 0
+
+    for indice, (nombre, valor) in enumerate(datos, start=1):
+        total += valor
+        conteo += 1
+
+        if mostrar_ranking:
+            lineas.append(f"#{indice} {nombre:<{ancho_nombre}} {moneda}{valor:,.2f}")
+        else:
+            lineas.append(f"{nombre:<{ancho_nombre}} {moneda}{valor:,.2f}")
+
+    if mostrar_promedio:
+        lineas.append("---")
+        promedio = 0
+        if conteo > 0:
+            promedio = total / conteo
+        lineas.append(f"{'Promedio':<{ancho_nombre}} {moneda}{promedio:,.2f}")
+
+    return "\n".join(lineas)
 
 
 # --- Pruebas (NO modificar) ---
